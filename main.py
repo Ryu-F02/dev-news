@@ -5,6 +5,9 @@ import requests
 from openai import OpenAI
 from datetime import datetime, timedelta
 
+def main():
+    requests.post(DISCORD_WEBHOOK, json={"content": "🚀 bot test message"})
+
 DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
