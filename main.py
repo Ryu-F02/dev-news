@@ -1,94 +1,103 @@
-import os
-import json
 import feedparser
+import json
+import os
 import requests
 from openai import OpenAI
-from datetime import datetime, timedelta
 
-DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-client = OpenAI(api_key=OPENAI_API_KEY)
-
+# ------------------------------
+# RSSフィード定義（Enterprise NW寄りのみ）
+# ------------------------------
 RSS_FEEDS = {
     "NetworkWorld": "https://www.networkworld.com/category/networking/index.rss",
-    "RedditNetworking": "https://www.reddit.com/r/networking/.rss"
+    "ArsTechnica": "https://arstechnica.com/information-technology/feed/",
+    "TheRegister": "https://www.theregister.com/security/headlines.atom",
+    "Cloudflare": "https://blog.cloudflare.com/rss/",
+    "AWSNetworking": "https://aws.amazon.com/blogs/networking-and-content-delivery/feed/",
+    "GoogleCloud": "https://cloud.google.com/blog/rss/"
 }
 
-def evaluate_article(title, summary, source):
+# ------------------------------
+# Discord送信関数
+# ------------------------------
+DISCORD_WEBHOOK = os.environ.get("DISCORD_WEBHOOK")
 
+def send_to_discord(title, link, source, ai_info):
+    message = f"**{title}**\nSource: {source}\nScore: {ai_info.get('score', 'N/A')}\n\n{ai_info.get('why','')}\n{link}"
+    payload = {"content": message}
+    r = requests.post(DISCORD_WEBHOOK, json=payload)
+    if r.status_code != 204:
+        print(f"Discord送信失敗: {r.status_code}, {r.text}")
+
+# ------------------------------
+# AI評価関数（日本語でスコア付与）
+# ------------------------------
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+client = OpenAI(api_key=OPENAI_API_KEY)
+
+def evaluate_article(title, summary, source_name):
     prompt = f"""
-あなたはエンタープライズネットワーク専門アナリストです。
+以下の記事について評価してください。
+- 記事タイトル: {title}
+- 記事概要: {summary}
+- 出典: {source_name}
 
-以下の記事が企業ネットワーク（SD-WAN、SASE、BGP、DC、セキュリティ、Cisco、Juniper等）
-の観点でどれほど重要か評価してください。
+評価ルール:
+1. エンタープライズネットワーク戦略や業界トレンドに関連する重要性を0-100のスコアで付与。
+2. 「なぜそのスコアか」を日本語で簡潔に説明。
+3. 出力はJSON形式で以下の形式で返すこと。
 
-【必須条件】
-・whyは必ず日本語で書く
-・簡潔に2〜3文
-・JSONのみ出力
-
-出力形式：
-{{
- "score": 0-100,
- "why": "日本語で理由を書く"
-}}
-
-Title: {title}
-Summary: {summary}
+{{"score": 数値, "why": "説明文"}}
 """
-
     response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.2
+        messages=[{"role": "user", "content": prompt}]
     )
-
     return response.choices[0].message.content
 
-
-def send_to_discord(title, link, source, ai_json):
-
-    message = f"""
-**{title}**
-Source: {source}
-Score: {ai_json.get('score')}
-
-Why:
-{ai_json.get('why')}
-
-{link}
-"""
-
-    r = requests.post(DISCORD_WEBHOOK, json={"content": message})
-
-    print("=== DISCORD DEBUG ===")
-    print("STATUS:", r.status_code)
-    print("RESPONSE:", r.text)
-    print("=====================")
-
-
+# ------------------------------
+# メイン処理
+# ------------------------------
 def main():
+    candidates = []
 
     for source_name, feed_url in RSS_FEEDS.items():
         feed = feedparser.parse(feed_url)
 
-        for entry in feed.entries[:3]:
-
+        # 各フィード最新5件まで
+        for entry in feed.entries[:5]:
             title = entry.title
             summary = entry.get("summary", "")
             link = entry.link
 
-            ai_raw = evaluate_article(title, summary, source_name)
-
             try:
+                ai_raw = evaluate_article(title, summary, source_name)
                 ai_json = json.loads(ai_raw)
-            except:
+            except Exception as e:
+                print(f"AI評価失敗: {e}")
                 continue
 
-    if True:
-        send_to_discord(title, link, source_name, ai_json)
+            candidates.append({
+                "title": title,
+                "link": link,
+                "source": source_name,
+                "score": ai_json.get("score", 0),
+                "why": ai_json.get("why","")
+            })
 
+    # スコア順に並べる
+    candidates.sort(key=lambda x: x["score"], reverse=True)
+
+    # 上位3件を必ず投稿
+    top3 = candidates[:3]
+
+    for idx, item in enumerate(top3, 1):
+        rank_emoji = ["🥇", "🥈", "🥉"][idx-1] if idx <=3 else ""
+        send_to_discord(
+            f"{rank_emoji} {item['title']}",
+            item["link"],
+            item["source"],
+            {"score": item["score"], "why": item["why"]}
+        )
 
 if __name__ == "__main__":
     main()
