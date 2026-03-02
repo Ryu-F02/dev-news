@@ -84,7 +84,7 @@ def main():
             except:
                 continue
 
-            if ai_json.get("score", 0) >= 70:
+            if ai_json.get("score", 0) >= 65:
                 send_to_discord(title, link, source_name, ai_json)
 
 
