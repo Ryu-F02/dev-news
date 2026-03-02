@@ -21,12 +21,20 @@ RSS_FEEDS = {
 def evaluate_article(title, summary, source):
 
     prompt = f"""
-Enterprise NWトレンドとして重要か評価。
+あなたはエンタープライズネットワーク専門アナリストです。
 
-JSONのみで出力：
+以下の記事が企業ネットワーク（SD-WAN、SASE、BGP、DC、セキュリティ、Cisco、Juniper等）
+の観点でどれほど重要か評価してください。
+
+【必須条件】
+・whyは必ず日本語で書く
+・簡潔に2〜3文
+・JSONのみ出力
+
+出力形式：
 {{
  "score": 0-100,
- "why": ""
+ "why": "日本語で理由を書く"
 }}
 
 Title: {title}
