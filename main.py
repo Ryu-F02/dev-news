@@ -5,9 +5,6 @@ import requests
 from openai import OpenAI
 from datetime import datetime, timedelta
 
-def main():
-    requests.post(DISCORD_WEBHOOK, json={"content": "🚀 bot test message"})
-
 DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
@@ -63,7 +60,12 @@ Why:
 {link}
 """
 
-    requests.post(DISCORD_WEBHOOK, json={"content": message})
+    r = requests.post(DISCORD_WEBHOOK, json={"content": message})
+
+    print("=== DISCORD DEBUG ===")
+    print("STATUS:", r.status_code)
+    print("RESPONSE:", r.text)
+    print("=====================")
 
 
 def main():
