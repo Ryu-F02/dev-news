@@ -1,13 +1,3 @@
 feedparser
 requests
-beautifulsoup4
-newspaper3k
 openai
-lxml
-feedparser
-requests
-beautifulsoup4
-newspaper3k
-openai
-lxml
-lxml_html_clean
