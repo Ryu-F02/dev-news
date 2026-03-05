@@ -14,8 +14,8 @@ RSS_FEEDS = {
     "Cloudflare": "https://blog.cloudflare.com/rss/",
     "AWSNetworking": "https://aws.amazon.com/blogs/networking-and-content-delivery/feed/",
     "GoogleCloud": "https://cloud.google.com/blog/rss/"
-    "Qiita"："https://qiita.com/tags/network/feed"
-    "Zenn"："https://zenn.dev/topics/network/feed"
+    "Qiita": "https://qiita.com/tags/network/feed"
+    "Zenn": "https://zenn.dev/topics/network/feed"
 }
 
 # ------------------------------
