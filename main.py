@@ -14,6 +14,8 @@ RSS_FEEDS = {
     "Cloudflare": "https://blog.cloudflare.com/rss/",
     "AWSNetworking": "https://aws.amazon.com/blogs/networking-and-content-delivery/feed/",
     "GoogleCloud": "https://cloud.google.com/blog/rss/"
+    "Qiita"："https://qiita.com/tags/network/feed"
+    "Zenn"："https://zenn.dev/topics/network/feed"
 }
 
 # ------------------------------
@@ -45,6 +47,7 @@ def evaluate_article(title, summary, source_name):
 1. エンタープライズネットワーク戦略や業界トレンドに関連する重要性を0-100のスコアで付与。
 2. 「なぜそのスコアか」を日本語で簡潔に説明。
 3. 出力はJSON形式で以下の形式で返すこと。
+4. 日本語の記事が出力された場合、加点し、必ず、ランキングに乗せること。
 
 {{"score": 数値, "why": "説明文"}}
 """
