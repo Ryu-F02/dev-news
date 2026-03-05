@@ -8,14 +8,14 @@ from openai import OpenAI
 # RSSフィード定義（Enterprise NW寄りのみ）
 # ------------------------------
 RSS_FEEDS = {
-    "NetworkWorld": "https://www.networkworld.com/category/networking/index.rss",
-    "ArsTechnica": "https://arstechnica.com/information-technology/feed/",
-    "TheRegister": "https://www.theregister.com/security/headlines.atom",
-    "Cloudflare": "https://blog.cloudflare.com/rss/",
+    "Automation-Zenn": "https://zenn.dev/topics/ansible/feed",
+    "Hatena-Network": "https://b.hatena.ne.jp/q/network?mode=rss",
+    "Study-book-Network": "https://www.infraexpert.com/rss.xml",
+    "Azure-Network": "https://azure.github.io/jpazpaas/feed.xml",
     "AWSNetworking": "https://aws.amazon.com/blogs/networking-and-content-delivery/feed/",
     "GoogleCloud": "https://cloud.google.com/blog/rss/",
-    "Qiita": "https://qiita.com/tags/network/feed",
-    "Zenn": "https://zenn.dev/topics/network/feed"
+    "Network-Qiita": "https://qiita.com/tags/network/feed",
+    "Network-Zenn": "https://zenn.dev/topics/network/feed"
 }
 
 # ------------------------------
